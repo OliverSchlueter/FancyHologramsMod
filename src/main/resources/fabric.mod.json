@@ -12,9 +12,6 @@
   "icon": "assets/fancyholograms/icon.png",
   "environment": "*",
   "entrypoints": {
-    "client": [
-      "de.oliver.fancyholograms.client.FancyhologramsClient"
-    ],
     "main": [
       "de.oliver.fancyholograms.Fancyholograms"
     ]
