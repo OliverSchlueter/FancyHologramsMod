@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "fancyholograms",
+  "version": "${version}",
+  "name": "FancyHolograms",
+  "description": "Make cool holograms with commands",
+  "authors": [
+    "OliverHD"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/fancyholograms/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "de.oliver.fancyholograms.client.FancyhologramsClient"
+    ],
+    "main": [
+      "de.oliver.fancyholograms.Fancyholograms"
+    ]
+  },
+  "mixins": [
+    "fancyholograms.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.14",
+    "fabric": "*",
+    "minecraft": "1.19.4-alpha.23.6.a"
+  }
+}
