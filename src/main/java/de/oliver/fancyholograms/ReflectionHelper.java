@@ -19,4 +19,19 @@ public class ReflectionHelper {
         return null;
     }
 
+    public static Object getValue(Object obj, String fieldName){
+        Field field = null;
+        try {
+            field = obj.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            Object val = field.get(obj);
+            field.setAccessible(false);
+            return val;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 }

@@ -6,6 +6,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import de.oliver.fancyholograms.HologramManager;
 import de.oliver.fancyholograms.ReflectionHelper;
 import de.oliver.fancyholograms.mixinInterfaces.IDisplayEntityMixin;
+import net.minecraft.command.argument.ColorArgumentType;
 import net.minecraft.command.argument.PosArgument;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
@@ -17,10 +18,17 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.Arrays;
+
 public class HologramCommand {
 
     private static final SuggestionProvider<ServerCommandSource> HOLOGRAM_NAMES_SUGGESTION_PROVIDER = (context, builder) -> {
         HologramManager.getAllNames().forEach(builder::suggest);
+        return builder.buildFuture();
+    };
+
+    private static final SuggestionProvider<ServerCommandSource> BILLBOARD_SUGGESTION_PROVIDER = (context, builder) -> {
+        Arrays.stream(DisplayEntity.BillboardMode.values()).map(DisplayEntity.BillboardMode::asString).forEach(builder::suggest);
         return builder.buildFuture();
     };
 
@@ -47,8 +55,13 @@ public class HologramCommand {
                                                 )
                                         )
                                         .then(CommandManager.literal("background")
-                                                .then(CommandManager.argument("background", net.minecraft.command.argument.ColorArgumentType.color())
+                                                .then(CommandManager.argument("background", ColorArgumentType.color())
                                                         .executes(context -> executeEditBackground(context.getSource(), context.getArgument("name", String.class), context.getArgument("background", Formatting.class)))
+                                                )
+                                        )
+                                        .then(CommandManager.literal("billboard")
+                                                .then(CommandManager.argument("billboard", StringArgumentType.word()).suggests(BILLBOARD_SUGGESTION_PROVIDER)
+                                                        .executes(context -> executeEditBillboard(context.getSource(), context.getArgument("name", String.class), context.getArgument("billboard", String.class)))
                                                 )
                                         )
                                 )
@@ -95,6 +108,27 @@ public class HologramCommand {
     private static int executeEditBackground(ServerCommandSource source, String name, Formatting color){
         DisplayEntity.TextDisplayEntity entity = (DisplayEntity.TextDisplayEntity) HologramManager.getHologram(name);
         entity.getDataTracker().set((TrackedData<Integer>) ReflectionHelper.getStaticValue(DisplayEntity.TextDisplayEntity.class, "BACKGROUND"), color.getColorValue() | 0xC8000000);
+        source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
+        return 1;
+    }
+
+    private static int executeEditBillboard(ServerCommandSource source, String name, String billboardName){
+        DisplayEntity entity = (DisplayEntity) HologramManager.getHologram(name);
+
+        byte index = 3;
+
+        switch (billboardName.toLowerCase()){
+            case "fixed" -> index = 0;
+            case "vertical" -> index = 1;
+            case "horizontal" -> index = 2;
+            case "center" -> index = 3;
+            default -> {
+                source.getPlayer().sendMessage(Text.literal("Could not find billboard: '" + billboardName + "'").formatted(Formatting.RED));
+                return 0;
+            }
+        }
+
+        entity.getDataTracker().set((TrackedData<Byte>) ReflectionHelper.getStaticValue(DisplayEntity.class, "BILLBOARD"), index);
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
     }
