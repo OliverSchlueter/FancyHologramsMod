@@ -25,4 +25,8 @@ public class HologramManager {
     public static Set<String> getAllNames(){
         return holograms.keySet();
     }
+
+    public static void clear(){
+        holograms.clear();
+    }
 }

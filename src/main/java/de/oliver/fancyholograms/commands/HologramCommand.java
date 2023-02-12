@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import de.oliver.fancyholograms.HologramManager;
 import de.oliver.fancyholograms.ReflectionHelper;
+import de.oliver.fancyholograms.mixinInterfaces.IDisplayEntityMixin;
 import net.minecraft.command.argument.PosArgument;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
@@ -68,8 +69,11 @@ public class HologramCommand {
         entity.getDataTracker().set((TrackedData<Integer>) ReflectionHelper.getStaticValue(DisplayEntity.TextDisplayEntity.class, "BACKGROUND"), 0);
         entity.getDataTracker().set((TrackedData<Byte>) ReflectionHelper.getStaticValue(DisplayEntity.class, "BILLBOARD"), (byte) 3); // center
 
+        IDisplayEntityMixin displayEntityMixin = (IDisplayEntityMixin) entity;
+        displayEntityMixin.setIsHologram(true);
+        displayEntityMixin.setHologramName(name);
+
         source.getWorld().spawnEntity(entity);
-        HologramManager.addHologram(name, entity);
         source.getPlayer().sendMessage(Text.literal("Created new hologram").formatted(Formatting.GREEN));
         return 1;
     }

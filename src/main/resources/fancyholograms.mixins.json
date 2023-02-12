@@ -4,6 +4,7 @@
   "package": "de.oliver.fancyholograms.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "DisplayEntityMixin"
   ],
   "client": [
   ],
