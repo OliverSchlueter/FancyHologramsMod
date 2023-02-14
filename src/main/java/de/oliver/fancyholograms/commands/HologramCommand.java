@@ -100,6 +100,11 @@ public class HologramCommand {
 
     private static int executeEditText(ServerCommandSource source, String name, Text text){
         DisplayEntity.TextDisplayEntity entity = (DisplayEntity.TextDisplayEntity) HologramManager.getHologram(name);
+        if(entity == null){
+            source.sendError(Text.literal("Could not find hologram: '" + name + "'"));
+            return 0;
+        }
+
         entity.getDataTracker().set((TrackedData<Text>) ReflectionHelper.getStaticValue(DisplayEntity.TextDisplayEntity.class, "TEXT"), text);
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
@@ -107,6 +112,11 @@ public class HologramCommand {
 
     private static int executeEditPos(ServerCommandSource source, String name, PosArgument pos){
         DisplayEntity.TextDisplayEntity entity = (DisplayEntity.TextDisplayEntity) HologramManager.getHologram(name);
+        if(entity == null){
+            source.sendError(Text.literal("Could not find hologram: '" + name + "'"));
+            return 0;
+        }
+
         entity.setPosition(pos.toAbsolutePos(source));
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
@@ -114,6 +124,11 @@ public class HologramCommand {
 
     private static int executeEditBackground(ServerCommandSource source, String name, Formatting color){
         DisplayEntity.TextDisplayEntity entity = (DisplayEntity.TextDisplayEntity) HologramManager.getHologram(name);
+        if(entity == null){
+            source.sendError(Text.literal("Could not find hologram: '" + name + "'"));
+            return 0;
+        }
+
         entity.getDataTracker().set((TrackedData<Integer>) ReflectionHelper.getStaticValue(DisplayEntity.TextDisplayEntity.class, "BACKGROUND"), color.getColorValue() | 0xC8000000);
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
@@ -121,6 +136,10 @@ public class HologramCommand {
 
     private static int executeEditBillboard(ServerCommandSource source, String name, String billboardName){
         DisplayEntity entity = (DisplayEntity) HologramManager.getHologram(name);
+        if(entity == null){
+            source.sendError(Text.literal("Could not find hologram: '" + name + "'"));
+            return 0;
+        }
 
         byte index = 3;
 
@@ -130,7 +149,7 @@ public class HologramCommand {
             case "horizontal" -> index = 2;
             case "center" -> index = 3;
             default -> {
-                source.getPlayer().sendMessage(Text.literal("Could not find billboard: '" + billboardName + "'").formatted(Formatting.RED));
+                source.sendError(Text.literal("Could not find billboard: '" + billboardName + "'").formatted(Formatting.RED));
                 return 0;
             }
         }
@@ -142,6 +161,11 @@ public class HologramCommand {
 
     private static int executeEditScale(ServerCommandSource source, String name, Float scale){
         DisplayEntity entity = (DisplayEntity) HologramManager.getHologram(name);
+        if(entity == null){
+            source.sendError(Text.literal("Could not find hologram: '" + name + "'"));
+            return 0;
+        }
+
         entity.getDataTracker().set((TrackedData<Vector3f>) ReflectionHelper.getStaticValue(DisplayEntity.class, "SCALE"), new Vector3f(scale, scale, scale));
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
@@ -149,6 +173,11 @@ public class HologramCommand {
 
     private static int executeRemove(ServerCommandSource source, String name){
         DisplayEntity.TextDisplayEntity entity = (DisplayEntity.TextDisplayEntity) HologramManager.getHologram(name);
+        if(entity == null){
+            source.sendError(Text.literal("Could not find hologram: '" + name + "'"));
+            return 0;
+        }
+
         entity.kill();
         HologramManager.removeHologram(name);
         source.getPlayer().sendMessage(Text.literal("Removed hologram").formatted(Formatting.GREEN));
