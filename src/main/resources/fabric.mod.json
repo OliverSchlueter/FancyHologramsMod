@@ -13,7 +13,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "de.oliver.fancyholograms.Fancyholograms"
+      "de.oliver.fancyholograms.FancyHolograms"
     ]
   },
   "mixins": [

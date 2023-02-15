@@ -12,7 +12,7 @@ import net.minecraft.entity.decoration.DisplayEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Fancyholograms implements ModInitializer {
+public class FancyHolograms implements ModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("FancyHolograms");
 
