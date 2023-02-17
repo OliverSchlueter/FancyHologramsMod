@@ -42,6 +42,7 @@ public class HologramCommand {
                 CommandManager.literal("hologram")
                         .then(CommandManager.literal("create")
                             .then(CommandManager.argument("name", StringArgumentType.word())
+                                    .executes(context -> executeCreate(context.getSource(), context.getArgument("name", String.class), Text.literal("New hologram")))
                                     .then(CommandManager.argument("text", TextArgumentType.text())
                                             .executes(context -> executeCreate(context.getSource(), context.getArgument("name", String.class), context.getArgument("text", Text.class)))
                                     )
@@ -86,6 +87,10 @@ public class HologramCommand {
 
 
     private static int executeCreate(ServerCommandSource source, String name, Text text){
+        if (HologramManager.getHologram(name) != null) {
+            source.sendError(Text.literal("A hologram with this name already exists: '" + name + "'"));
+            return 0;
+        }
         DisplayEntity.TextDisplayEntity entity = new DisplayEntity.TextDisplayEntity(EntityType.TEXT_DISPLAY, source.getWorld());
         entity.setPosition(source.getPosition());
         entity.getDataTracker().set((TrackedData<Text>) ReflectionHelper.getStaticValue(DisplayEntity.TextDisplayEntity.class, "TEXT"), text);
