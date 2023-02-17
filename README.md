@@ -2,7 +2,7 @@
 
 Make fancy holograms with commands using the new text display entities.
 
-Current minecraft version: **23w06a**.
+Current minecraft version: **23w07a**.
 
 Requires [Fabric API](https://modrinth.com/mod/fabric-api).
 
