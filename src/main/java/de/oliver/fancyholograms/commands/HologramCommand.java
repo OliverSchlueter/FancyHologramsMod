@@ -12,14 +12,13 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.oliver.fancyholograms.HologramManager;
-import de.oliver.fancyholograms.ReflectionHelper;
 import de.oliver.fancyholograms.mixinInterfaces.IDisplayEntityMixin;
+import de.oliver.fancyholograms.mixinInterfaces.ITextDisplayEntityMixin;
 import net.minecraft.command.argument.ColorArgumentType;
 import net.minecraft.command.argument.PosArgument;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -92,14 +91,16 @@ public class HologramCommand {
             return 0;
         }
         DisplayEntity.TextDisplayEntity entity = new DisplayEntity.TextDisplayEntity(EntityType.TEXT_DISPLAY, source.getWorld());
-        entity.setPosition(source.getPosition());
-        entity.getDataTracker().set((TrackedData<Text>) ReflectionHelper.getStaticValue(DisplayEntity.TextDisplayEntity.class, "TEXT"), text);
-        entity.getDataTracker().set((TrackedData<Integer>) ReflectionHelper.getStaticValue(DisplayEntity.TextDisplayEntity.class, "BACKGROUND"), 0);
-        entity.getDataTracker().set((TrackedData<Byte>) ReflectionHelper.getStaticValue(DisplayEntity.class, "BILLBOARD"), (byte) 3); // center
-
+        ITextDisplayEntityMixin textDisplayEntityMixin = (ITextDisplayEntityMixin) entity;
         IDisplayEntityMixin displayEntityMixin = (IDisplayEntityMixin) entity;
-        displayEntityMixin.setIsHologram(true);
-        displayEntityMixin.setHologramName(name);
+
+        entity.setPosition(source.getPosition());
+        entity.getDataTracker().set(textDisplayEntityMixin.getTextData(), text);
+        entity.getDataTracker().set(textDisplayEntityMixin.getBackgroundData(), 0);
+        entity.getDataTracker().set(displayEntityMixin.getBillboardData(), (byte) 3); // center
+
+        textDisplayEntityMixin.setIsHologram(true);
+        textDisplayEntityMixin.setHologramName(name);
 
         source.getWorld().spawnEntity(entity);
         source.getPlayer().sendMessage(Text.literal("Created new hologram").formatted(Formatting.GREEN));
@@ -107,7 +108,8 @@ public class HologramCommand {
     }
 
     private static int executeEditText(ServerCommandSource source, DisplayEntity.TextDisplayEntity hologram, Text text){
-        hologram.getDataTracker().set((TrackedData<Text>) ReflectionHelper.getStaticValue(DisplayEntity.TextDisplayEntity.class, "TEXT"), text);
+        ITextDisplayEntityMixin textDisplayEntityMixin = (ITextDisplayEntityMixin) hologram;
+        hologram.getDataTracker().set(textDisplayEntityMixin.getTextData(), text);
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
     }
@@ -119,12 +121,15 @@ public class HologramCommand {
     }
 
     private static int executeEditBackground(ServerCommandSource source, DisplayEntity.TextDisplayEntity hologram, Formatting color){
-        hologram.getDataTracker().set((TrackedData<Integer>) ReflectionHelper.getStaticValue(DisplayEntity.TextDisplayEntity.class, "BACKGROUND"), color.getColorValue() | 0xC8000000);
+        ITextDisplayEntityMixin textDisplayEntityMixin = (ITextDisplayEntityMixin) hologram;
+        hologram.getDataTracker().set(textDisplayEntityMixin.getBackgroundData(), color.getColorValue() | 0xC8000000);
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
     }
 
     private static int executeEditBillboard(ServerCommandSource source, DisplayEntity.TextDisplayEntity hologram, String billboardName){
+        IDisplayEntityMixin displayEntityMixin = (IDisplayEntityMixin) hologram;
+
         byte index = 3;
 
         switch (billboardName.toLowerCase()){
@@ -138,19 +143,21 @@ public class HologramCommand {
             }
         }
 
-        hologram.getDataTracker().set((TrackedData<Byte>) ReflectionHelper.getStaticValue(DisplayEntity.class, "BILLBOARD"), index);
+        hologram.getDataTracker().set(displayEntityMixin.getBillboardData(), index);
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
     }
 
     private static int executeEditScale(ServerCommandSource source, DisplayEntity.TextDisplayEntity hologram, Float scale){
-        hologram.getDataTracker().set((TrackedData<Vector3f>) ReflectionHelper.getStaticValue(DisplayEntity.class, "SCALE"), new Vector3f(scale, scale, scale));
+        IDisplayEntityMixin displayEntityMixin = (IDisplayEntityMixin) hologram;
+        hologram.getDataTracker().set(displayEntityMixin.getScaleData(), new Vector3f(scale, scale, scale));
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
     }
 
     private static int executeRemove(ServerCommandSource source, DisplayEntity.TextDisplayEntity hologram){
-        IDisplayEntityMixin displayEntityMixin = (IDisplayEntityMixin) hologram;
+        ITextDisplayEntityMixin displayEntityMixin = (ITextDisplayEntityMixin) hologram;
+        displayEntityMixin.setIsHologram(false);
 
         hologram.kill();
         HologramManager.removeHologram(displayEntityMixin.getHologramName());

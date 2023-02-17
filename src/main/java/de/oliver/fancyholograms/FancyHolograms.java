@@ -1,7 +1,7 @@
 package de.oliver.fancyholograms;
 
 import de.oliver.fancyholograms.commands.HologramCommand;
-import de.oliver.fancyholograms.mixinInterfaces.IDisplayEntityMixin;
+import de.oliver.fancyholograms.mixinInterfaces.ITextDisplayEntityMixin;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -25,14 +25,14 @@ public class FancyHolograms implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTING.register(server -> HologramManager.clear());
 
         ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
-            if(!(entity instanceof DisplayEntity displayEntity)){
+            if(!(entity instanceof DisplayEntity.TextDisplayEntity textEntity)){
                 return;
             }
 
-            IDisplayEntityMixin displayEntityMixin = (IDisplayEntityMixin) displayEntity;
-            if (displayEntityMixin.isHologram()) {
-                HologramManager.addHologram(displayEntityMixin.getHologramName(), entity);
-                LOGGER.info("Loaded the " + displayEntityMixin.getHologramName() + " hologram");
+            ITextDisplayEntityMixin textDisplayEntityMixin = (ITextDisplayEntityMixin) textEntity;
+            if (textDisplayEntityMixin.isHologram()) {
+                HologramManager.addHologram(textDisplayEntityMixin.getHologramName(), entity);
+                LOGGER.info("Loaded the " + textDisplayEntityMixin.getHologramName() + " hologram");
             }
         });
 

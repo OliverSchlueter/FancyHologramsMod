@@ -1,9 +1,10 @@
 package de.oliver.fancyholograms.mixinInterfaces;
 
-public interface IDisplayEntityMixin {
-    boolean isHologram();
-    void setIsHologram(boolean isHologram);
+import net.minecraft.entity.data.TrackedData;
+import org.joml.Vector3f;
 
-    String getHologramName();
-    void setHologramName(String hologramName);
+public interface IDisplayEntityMixin {
+    TrackedData<Byte> getBillboardData();
+    TrackedData<Vector3f> getScaleData();
+
 }
