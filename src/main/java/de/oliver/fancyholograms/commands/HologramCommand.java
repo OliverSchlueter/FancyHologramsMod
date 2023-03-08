@@ -116,6 +116,7 @@ public class HologramCommand {
 
     private static int executeEditPos(ServerCommandSource source, DisplayEntity.TextDisplayEntity hologram, PosArgument pos){
         hologram.setPosition(pos.toAbsolutePos(source));
+        hologram.setYaw(source.getPlayer().getYaw());
         source.getPlayer().sendMessage(Text.literal("Edited hologram").formatted(Formatting.GREEN));
         return 1;
     }
